@@ -207,5 +207,10 @@ export interface BaseDataSourceOptions {
                * Used to specify if cache errors should be ignored, and pass through the call to the Database.
                */
               readonly ignoreErrors?: boolean
+
+              /**
+               * Only cache query results that are either non-empty responses from the database or that have already been cached.
+               */
+              readonly ignoreEmptyResponses?: boolean
           }
 }

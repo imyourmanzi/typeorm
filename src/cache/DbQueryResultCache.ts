@@ -21,6 +21,8 @@ export class DbQueryResultCache implements QueryResultCache {
 
     private queryResultCacheSchema?: string
 
+    private ignoreEmptyResponses?: boolean
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -41,6 +43,7 @@ export class DbQueryResultCache implements QueryResultCache {
             schema,
             database,
         )
+        this.ignoreEmptyResponses = cacheOptions.ignoreEmptyResponses
     }
 
     // -------------------------------------------------------------------------
@@ -210,6 +213,15 @@ export class DbQueryResultCache implements QueryResultCache {
         savedCache: QueryResultCacheOptions | undefined,
         queryRunner?: QueryRunner,
     ): Promise<void> {
+        if (
+            this.ignoreEmptyResponses &&
+            (!options.result || options.result === "[]") &&
+            !savedCache?.result
+        ) {
+            // when requested, do not store empty response in the cache if there is no existing entry
+            return
+        }
+
         const shouldCreateQueryRunner =
             queryRunner === undefined ||
             queryRunner?.getReplicationMode() === "slave"
